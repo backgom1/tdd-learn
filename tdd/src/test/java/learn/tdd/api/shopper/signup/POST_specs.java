@@ -1,9 +1,7 @@
-package learn.tdd.api.seller.signup;
+package learn.tdd.api.shopper.signup;
 
 import learn.TddApiTest;
-import learn.tdd.command.CreateSellerCommand;
-import learn.tdd.domain.Seller;
-import learn.tdd.infra.repository.SellerRepository;
+import learn.tdd.command.CreateShopperCommand;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,27 +11,32 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static learn.tdd.infra.util.GeneratorUtil.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @TddApiTest
-@DisplayName("POST /seller/signup")
+@DisplayName("POST /shopper/signup")
 public class POST_specs {
-
     @Test
-    @DisplayName("올바르게 요청하면 204 No Content 상태코드를 반환한다.")
-    void response_should_return_204_when_request_is_correct(@Autowired TestRestTemplate client) {
-        // AAA 패턴
+    void 올바르게_요청하면_204_No_Content_상태코드를_반환한다(
+            @Autowired TestRestTemplate client
+    ) {
+        // Arrange
+        var command = new CreateShopperCommand(
+                generateEmail(),
+                generateUsername(),
+                generatePassword()
+        );
 
-        //Arrange
-        var command = new CreateSellerCommand(generateEmail(), generateUsername(), "password");
+        // Act
+        ResponseEntity<Void> response = client.postForEntity(
+                "/shopper/signup",
+                command,
+                Void.class
+        );
 
-        //Act
-        ResponseEntity<Void> response = client.postForEntity("/seller/signup", command, Void.class);
-
-        //Assert
+        // Assert
         assertThat(response.getStatusCode().value()).isEqualTo(204);
     }
 
@@ -42,68 +45,15 @@ public class POST_specs {
             @Autowired TestRestTemplate client
     ) {
         // Arrange
-        var command = new CreateSellerCommand(
+        var command = new CreateShopperCommand(
                 null,
                 generateUsername(),
-                "password"
+                generatePassword()
         );
 
         // Act
         ResponseEntity<Void> response = client.postForEntity(
-                "/seller/signup",
-                command,
-                Void.class
-        );
-
-        // Assert
-        assertThat(response.getStatusCode().value()).isEqualTo(400);
-    }
-
-    @Test
-    void username_속성이_지정되지_않으면_400_Bad_Request_상태코드를_반환한다(
-            @Autowired TestRestTemplate client
-    ) {
-        // Arrange
-        var command = new CreateSellerCommand(
-                generateEmail(),
-                null,
-                "password"
-        );
-
-        // Act
-        ResponseEntity<Void> response = client.postForEntity(
-                "/seller/signup",
-                command,
-                Void.class
-        );
-
-        // Assert
-        assertThat(response.getStatusCode().value()).isEqualTo(400);
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = {
-            "",
-            "se",
-            "seller ",
-            "seller.",
-            "seller!",
-            "seller@"
-    })
-    void username_속성이_올바른_형식을_따르지_않으면_400_Bad_Request_상태코드를_반환한다(
-            String username,
-            @Autowired TestRestTemplate client
-    ) {
-        // Arrange
-        var command = new CreateSellerCommand(
-                generateEmail(),
-                username,
-                "password"
-        );
-
-        // Act
-        ResponseEntity<Void> response = client.postForEntity(
-                "/seller/signup",
+                "/shopper/signup",
                 command,
                 Void.class
         );
@@ -125,15 +75,37 @@ public class POST_specs {
             @Autowired TestRestTemplate client
     ) {
         // Arrange
-        var command = new CreateSellerCommand(
+        var command = new CreateShopperCommand(
                 email,
                 generateUsername(),
-                "password"
+                generatePassword()
         );
 
         // Act
         ResponseEntity<Void> response = client.postForEntity(
-                "/seller/signup",
+                "/shopper/signup",
+                command,
+                Void.class
+        );
+
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(400);
+    }
+
+    @Test
+    void username_속성이_지정되지_않으면_400_Bad_Request_상태코드를_반환한다(
+            @Autowired TestRestTemplate client
+    ) {
+        // Arrange
+        var command = new CreateShopperCommand(
+                generateEmail(),
+                null,
+                generatePassword()
+        );
+
+        // Act
+        ResponseEntity<Void> response = client.postForEntity(
+                "/shopper/signup",
                 command,
                 Void.class
         );
@@ -144,26 +116,57 @@ public class POST_specs {
 
     @ParameterizedTest
     @ValueSource(strings = {
-            "seller",
+            "",
+            "sh",
+            "shopper ",
+            "shopper.",
+            "shopper!",
+            "shopper@"
+    })
+    void username_속성이_올바른_형식을_따르지_않으면_400_Bad_Request_상태코드를_반환한다(
+            String username,
+            @Autowired TestRestTemplate client
+    ) {
+        // Arrange
+        var command = new CreateShopperCommand(
+                generateEmail(),
+                username,
+                generatePassword()
+        );
+
+        // Act
+        ResponseEntity<Void> response = client.postForEntity(
+                "/shopper/signup",
+                command,
+                Void.class
+        );
+
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(400);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "abcdefghijklmnopqrstuvwxyz",
             "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
             "0123456789",
-            "seller_",
-            "seller-"
+            "shopper_",
+            "shopper-"
     })
     void username_속성이_올바른_형식을_따르면_204_No_Content_상태코드를_반환한다(
             String username,
             @Autowired TestRestTemplate client
     ) {
         // Arrange
-        var command = new CreateSellerCommand(
+        var command = new CreateShopperCommand(
                 generateEmail(),
                 username,
-                "password"
+                generatePassword()
         );
 
         // Act
         ResponseEntity<Void> response = client.postForEntity(
-                "/seller/signup",
+                "/shopper/signup",
                 command,
                 Void.class
         );
@@ -177,7 +180,7 @@ public class POST_specs {
             @Autowired TestRestTemplate client
     ) {
         // Arrange
-        var command = new CreateSellerCommand(
+        var command = new CreateShopperCommand(
                 generateEmail(),
                 generateUsername(),
                 null
@@ -185,7 +188,7 @@ public class POST_specs {
 
         // Act
         ResponseEntity<Void> response = client.postForEntity(
-                "/seller/signup",
+                "/shopper/signup",
                 command,
                 Void.class
         );
@@ -201,7 +204,7 @@ public class POST_specs {
             @Autowired TestRestTemplate client
     ) {
         // Arrange
-        var command = new CreateSellerCommand(
+        var command = new CreateShopperCommand(
                 generateEmail(),
                 generateUsername(),
                 password
@@ -209,7 +212,7 @@ public class POST_specs {
 
         // Act
         ResponseEntity<Void> response = client.postForEntity(
-                "/seller/signup",
+                "/shopper/signup",
                 command,
                 Void.class
         );
@@ -226,22 +229,22 @@ public class POST_specs {
         String email = generateEmail();
 
         client.postForEntity(
-                "/seller/signup",
-                new CreateSellerCommand(
+                "/shopper/signup",
+                new CreateShopperCommand(
                         email,
                         generateUsername(),
-                        "password"
+                        generatePassword()
                 ),
                 Void.class
         );
 
         // Act
         ResponseEntity<Void> response = client.postForEntity(
-                "/seller/signup",
-                new CreateSellerCommand(
+                "/shopper/signup",
+                new CreateShopperCommand(
                         email,
                         generateUsername(),
-                        "password"
+                        generatePassword()
                 ),
                 Void.class
         );
@@ -251,63 +254,35 @@ public class POST_specs {
     }
 
     @Test
-    void username_속성에_이미_존재하는_사용자이름이_지정되면_400_Bad_Request_상태코드를_반환한다(
+    void username_속성이_이미_존재하는_사용자이름이_지정되면_400_Bad_Request_상태코드를_반환한다(
             @Autowired TestRestTemplate client
     ) {
         // Arrange
         String username = generateUsername();
 
         client.postForEntity(
-                "/seller/signup",
-                new CreateSellerCommand(
+                "/shopper/signup",
+                new CreateShopperCommand(
                         generateEmail(),
                         username,
-                        "password"
+                        generatePassword()
                 ),
                 Void.class
         );
 
         // Act
         ResponseEntity<Void> response = client.postForEntity(
-                "/seller/signup",
-                new CreateSellerCommand(
+                "/shopper/signup",
+                new CreateShopperCommand(
                         generateEmail(),
                         username,
-                        "password"
+                        generatePassword()
                 ),
                 Void.class
         );
 
         // Assert
         assertThat(response.getStatusCode().value()).isEqualTo(400);
-    }
-
-    @Test
-    void 비밀번호를_올바르게_암호화한다(
-            @Autowired TestRestTemplate client,
-            @Autowired SellerRepository repository,
-            @Autowired PasswordEncoder encoder
-    ) {
-        // Arrange
-        var command = new CreateSellerCommand(
-                generateEmail(),
-                generateUsername(),
-                generatePassword()
-        );
-
-        // Act
-        client.postForEntity("/seller/signup", command, Void.class);
-
-        // Assert
-        Seller seller = repository
-                .findAll()
-                .stream()
-                .filter(x -> x.getEmail().equals(command.email()))
-                .findFirst()
-                .orElseThrow();
-        String actual = seller.getHashPassword();
-        assertThat(actual).isNotNull();
-        assertThat(encoder.matches(command.password(), actual)).isTrue();
     }
 
 }
