@@ -120,3 +120,66 @@ curl -i -X POST 'http://localhost:8080/shopper/signUp' \
 - [ ] email 속성에 이미 존재하는 이메일 주소가 지정되면 400 Bad Request 상태코드를 반환한다
 - [ ] username 속성이 이미 존재하는 사용자이름이 지정되면 400 Bad Request 상태코드를 반환한다
 - [ ] 비밀번호를 올바르게 암호화한다
+
+## 판매자 정보 조회
+### 요청
+메서드: GET
+경로: /seller/me
+헤더
+```
+Authorization: Bearer {accessToken}
+curl 명령 예시
+curl -i -X GET 'http://localhost:8080/seller/me' \
+-H 'Authorization: Bearer {accessToken}'
+```
+
+### 성공 응답
+상태코드: 200 OK
+
+### 본문
+```
+SellerMeView {
+id: string(UUID),
+email: string,
+username: string,
+contactEmail: string
+}
+```
+### 테스트
+-[ ] 올바르게 요청하면 200 OK 상태코드를 반환한다
+-[ ] 접근 토큰을 사용하지 않으면 401 Unauthorized 상태코드를 반환한다
+-[ ] 서로 다른 판매자의 식별자는 서로 다르다
+-[ ] 같은 판매자의 식별자는 항상 같다
+-[ ] 판매자의 기본 정보가 올바르게 설정된다
+-[ ] 문의 이메일 주소를 올바르게 설정한다
+
+
+## 구매자 정보 조회
+### 요청
+메서드: GET
+경로: /shopper/me
+헤더
+```
+Authorization: Bearer {accessToken}
+curl 명령 예시
+curl -i -X GET 'http://localhost:8080/shopper/me' \
+-H 'Authorization: Bearer {accessToken}'
+```
+### 성공 응답
+상태코드: 200 OK
+
+### 본문
+```
+ShopperMeView {
+id: string(UUID),
+email: string,
+username: string
+}
+```
+### 테스트
+
+-[ ] 올바르게 요청하면 200 OK 상태코드를 반환한다
+-[ ] 접근 토큰을 사용하지 않으면 401 Unauthorized 상태코드를 반환한다
+-[ ] 서로 다른 구매자의 식별자는 서로 다르다
+-[ ] 같은 구매자의 식별자는 항상 같다
+-[ ] 구매자의 기본 정보가 올바르게 설정된다

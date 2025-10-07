@@ -3,6 +3,7 @@ package learn.tdd.api.controller;
 import io.jsonwebtoken.Jwts;
 import learn.tdd.domain.Seller;
 import learn.tdd.infra.repository.SellerRepository;
+import learn.tdd.infra.util.JwtKeyHolder;
 import learn.tdd.query.IssueSellerToken;
 import learn.tdd.result.AccessTokenCarrier;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,34 +23,38 @@ public class SellerIssueTokenController {
 
     private final SellerRepository sellerRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtKeyHolder jwtKeyHolder;
 
     @Value("${security.jwt.secret}")
     private String secret;
 
     @Autowired
-    public SellerIssueTokenController(SellerRepository sellerRepository, PasswordEncoder passwordEncoder) {
+    public SellerIssueTokenController(SellerRepository sellerRepository, PasswordEncoder passwordEncoder, JwtKeyHolder jwtKeyHolder) {
         this.sellerRepository = sellerRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtKeyHolder = jwtKeyHolder;
     }
 
 
     @PostMapping("/seller/issueToken")
-    public ResponseEntity<?> issueToken(@RequestBody IssueSellerToken request) {
-        Optional<Seller> optionalSeller = sellerRepository.findByEmail(request.email());
-        if (optionalSeller.isEmpty()) {
-            return ResponseEntity.badRequest().build();
-        }
+    ResponseEntity<?> issueToken(@RequestBody IssueSellerToken query) {
+        return sellerRepository
+                .findByEmail(query.email())
+                .filter(seller -> passwordEncoder.matches(
+                        query.password(),
+                        seller.getHashPassword()
+                ))
+                .map(this::composeToken)
+                .map(AccessTokenCarrier::new)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.badRequest().build());
+    }
 
-        Seller seller = optionalSeller.get();
 
-        if (!passwordEncoder.matches(request.password(), seller.getHashPassword())) {
-            return ResponseEntity.badRequest().build();
-        }
-
-
-        return ResponseEntity.ok(new AccessTokenCarrier(Jwts
-                .builder()
-                .signWith(new SecretKeySpec(secret.getBytes(), "HmacSHA256"))
-                .compact()));
+    private String composeToken(Seller seller) {
+        return Jwts.builder()
+                .setSubject(seller.getId().toString())
+                .signWith(jwtKeyHolder.key())
+                .compact();
     }
 }

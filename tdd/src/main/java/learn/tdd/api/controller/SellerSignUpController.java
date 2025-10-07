@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.UUID;
+
 import static learn.tdd.infra.util.UserPropertyValidator.*;
 
 @RestController
@@ -27,7 +29,7 @@ public record SellerSignUpController(SellerRepository sellerRepository, Password
         if (sellerRepository.existsByEmailOrUsername(request.email(), request.username())) {
             return ResponseEntity.badRequest().build();
         }
-        sellerRepository.save(Seller.of(request.email(), request.username(), request.password(), encoder));
+        sellerRepository.save(Seller.of(UUID.randomUUID(), request.email(), request.username(), request.password(), encoder));
 
 
         return ResponseEntity.noContent().build();
