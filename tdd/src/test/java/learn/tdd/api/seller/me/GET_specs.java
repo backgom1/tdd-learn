@@ -1,11 +1,11 @@
-package learn.tdd.api.me;
+package learn.tdd.api.seller.me;
 
 
 import learn.TddApiTest;
 import learn.tdd.command.CreateSellerCommand;
 import learn.tdd.query.IssueSellerToken;
 import learn.tdd.result.AccessTokenCarrier;
-import learn.view.SellerMeView;
+import learn.tdd.view.SellerMeView;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -179,5 +179,40 @@ public class GET_specs {
         assertThat(requireNonNull(response1.getBody()).id())
                 .isEqualTo(requireNonNull(response2.getBody()).id());
     }
+    @Test
+    void 판매자의_기본_정보가_올바르게_설정된다(
+            @Autowired TestRestTemplate client
+    ) {
+        // Arrange
+        String email = generateEmail();
+        String username = generateUsername();
+        String password = generatePassword();
 
+        var command = new CreateSellerCommand(
+                email,
+                username,
+                password
+        );
+        client.postForEntity("/seller/signup", command, Void.class);
+
+        AccessTokenCarrier carrier = client.postForObject(
+                "/seller/issueToken",
+                new IssueSellerToken(email, password),
+                AccessTokenCarrier.class
+        );
+        String token = carrier.accessToken();
+
+        // Act
+        ResponseEntity<SellerMeView> response = client.exchange(
+                get("/seller/me")
+                        .header("Authorization", "Bearer " + token)
+                        .build(),
+                SellerMeView.class
+        );
+
+        // Assert
+        SellerMeView actual = requireNonNull(response.getBody());
+        assertThat(actual.email()).isEqualTo(email);
+        assertThat(actual.username()).isEqualTo(username);
+    }
 }

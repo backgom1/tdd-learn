@@ -47,7 +47,8 @@ public class SecurityConfig {
                         .requestMatchers("/seller/signup").permitAll()
                         .requestMatchers("/seller/issueToken").permitAll()
                         .requestMatchers("/shopper/signup").permitAll()
-                        .requestMatchers("/shopper/me").authenticated()
+                        .requestMatchers("/shopper/issueToken").permitAll()
+                        .anyRequest().authenticated()
                 )
                 .build();
     }

@@ -1,6 +1,7 @@
 package learn;
 
 import learn.tdd.TddApplication;
+import learn.tdd.api.TestFixtureConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.lang.annotation.ElementType;
@@ -11,7 +12,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @SpringBootTest(
-        classes = TddApplication.class,
+        classes = {TddApplication.class, TestFixtureConfiguration.class},
         webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT
 )
 public @interface TddApiTest {
