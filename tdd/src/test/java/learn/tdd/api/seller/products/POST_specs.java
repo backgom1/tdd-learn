@@ -13,8 +13,8 @@ import java.net.URI;
 import java.util.UUID;
 import java.util.function.Predicate;
 
-import static learn.tdd.RegisterProductCommandGenerator.generateRegisterProductCommand;
-import static learn.tdd.RegisterProductCommandGenerator.generateRegisterProductCommandWithImageUri;
+import static learn.tdd.api.RegisterProductCommandGenerator.generateRegisterProductCommand;
+import static learn.tdd.api.RegisterProductCommandGenerator.generateRegisterProductCommandWithImageUri;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @TddApiTest

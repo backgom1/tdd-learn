@@ -15,6 +15,8 @@ import org.springframework.security.web.DefaultSecurityFilterChain;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
+import static org.springframework.security.oauth2.core.authorization.OAuth2AuthorizationManagers.hasScope;
+
 @Configuration
 public class SecurityConfig {
 
@@ -31,7 +33,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    JwtDecoder jwtDecoder(JwtKeyHolder jwtKeyHolder){
+    JwtDecoder jwtDecoder(JwtKeyHolder jwtKeyHolder) {
         return NimbusJwtDecoder.withSecretKey(jwtKeyHolder.key()).build();
     }
 
@@ -46,6 +48,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(requests -> requests
                         .requestMatchers("/seller/signup").permitAll()
                         .requestMatchers("/seller/issueToken").permitAll()
+                        .requestMatchers("/seller/**").access(hasScope("seller"))
                         .requestMatchers("/shopper/signup").permitAll()
                         .requestMatchers("/shopper/issueToken").permitAll()
                         .anyRequest().authenticated()

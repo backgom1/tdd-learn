@@ -15,4 +15,7 @@ public class GeneratorUtil {
     public static String generatePassword() {
         return "password" + UUID.randomUUID().toString();
     }
+
+
+
 }

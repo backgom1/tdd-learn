@@ -1,4 +1,4 @@
-package learn.tdd;
+package learn.tdd.api;
 
 import learn.tdd.command.RegisterProductCommand;
 
