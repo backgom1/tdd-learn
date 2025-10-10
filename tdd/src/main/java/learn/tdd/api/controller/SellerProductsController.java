@@ -4,9 +4,9 @@ import learn.tdd.command.RegisterProductCommand;
 import learn.tdd.domain.Product;
 import learn.tdd.infra.repository.ProductRepository;
 import learn.tdd.infra.repository.SellerRepository;
+import learn.tdd.result.ArrayCarrier;
 import learn.tdd.view.SellerProductView;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -15,9 +15,12 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static java.time.ZoneOffset.UTC;
+import static java.util.Collections.reverseOrder;
+import static java.util.Comparator.*;
 
 @RestController
 public record SellerProductsController(SellerRepository sellerRepository, ProductRepository productRepository) {
+
 
     @PostMapping("/seller/products")
     ResponseEntity<?> registerProducts(Principal user, @RequestBody RegisterProductCommand command) {
@@ -28,7 +31,8 @@ public record SellerProductsController(SellerRepository sellerRepository, Produc
 
         UUID sellerId = UUID.fromString(user.getName());
 
-        Product product = Product.of(uuid, sellerId, command.name(), command.description(), command.imageUrl(), command.priceAmount(), command.stockQuantity());
+        Product product = Product.of(uuid, sellerId, command.name(), command.description(), command.imageUrl(), command.priceAmount(), command.stockQuantity(),
+                LocalDateTime.now(UTC));
         productRepository.save(product);
         URI uri = URI.create("/seller/products/" + uuid);
         return ResponseEntity.created(uri).build();
@@ -43,21 +47,36 @@ public record SellerProductsController(SellerRepository sellerRepository, Produc
         }
     }
 
+    @GetMapping("/seller/products")
+    ResponseEntity<?> findAllProducts(Principal user) {
+        UUID uuid = UUID.fromString(user.getName());
+        SellerProductView[] productViews = productRepository.findAllBySellerId(uuid)
+                .stream()
+                .sorted(comparing(Product::getRegisteredTimeUtc, reverseOrder()))
+                .map(SellerProductsController::convertToView)
+                .toArray(SellerProductView[]::new);
+        return ResponseEntity.ok(new ArrayCarrier<>(productViews));
+    }
+
     @GetMapping("/seller/products/{id}")
     ResponseEntity<?> findProduct(@PathVariable UUID id, Principal user) {
         UUID uuid = UUID.fromString(user.getName());
         return productRepository.findById(id)
                 .filter(product -> product.getSellerId().equals(uuid))
-                .map(product -> new SellerProductView(
-                        product.getId(),
-                        product.getName(),
-                        product.getImageUrl(),
-                        product.getDescription(),
-                        product.getPrice(),
-                        product.getStockQuantity(),
-                        LocalDateTime.now(UTC)
-                ))
+                .map(SellerProductsController::convertToView)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    private static SellerProductView convertToView(Product product) {
+        return new SellerProductView(
+                product.getId(),
+                product.getName(),
+                product.getImageUrl(),
+                product.getDescription(),
+                product.getPrice(),
+                product.getStockQuantity(),
+                product.getRegisteredTimeUtc()
+        );
     }
 }

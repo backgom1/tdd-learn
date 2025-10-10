@@ -48,9 +48,10 @@ public class SecurityConfig {
                 .authorizeHttpRequests(requests -> requests
                         .requestMatchers("/seller/signup").permitAll()
                         .requestMatchers("/seller/issueToken").permitAll()
-                        .requestMatchers("/seller/**").access(hasScope("seller"))
                         .requestMatchers("/shopper/signup").permitAll()
                         .requestMatchers("/shopper/issueToken").permitAll()
+                        .requestMatchers("/seller/**").access(hasScope("seller"))
+                        .requestMatchers("/shopper/**").access(hasScope("shopper"))
                         .anyRequest().authenticated()
                 )
                 .build();
