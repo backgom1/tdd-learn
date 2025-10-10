@@ -1,4 +1,4 @@
-package learn.tdd.api.controller;
+package learn.tdd.querymodel;
 
 import learn.tdd.domain.Product;
 import learn.tdd.domain.Seller;
