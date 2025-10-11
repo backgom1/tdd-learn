@@ -33,7 +33,8 @@ public class POST_specs {
                 new CreateSellerCommand(
                         email,
                         generateUsername(),
-                        password
+                        password,
+                        generateEmail()
                 ),
                 Void.class
         );
@@ -62,7 +63,8 @@ public class POST_specs {
                 new CreateSellerCommand(
                         email,
                         generateUsername(),
-                        password
+                        password,
+                        generateEmail()
                 ),
                 Void.class
         );
@@ -92,7 +94,8 @@ public class POST_specs {
                 new CreateSellerCommand(
                         email,
                         generateUsername(),
-                        password
+                        password,
+                        generateEmail()
                 ),
                 Void.class
         );
@@ -141,7 +144,8 @@ public class POST_specs {
                 new CreateSellerCommand(
                         email,
                         generateUsername(),
-                        password
+                        password,
+                        generateEmail()
                 ),
                 Void.class
         );

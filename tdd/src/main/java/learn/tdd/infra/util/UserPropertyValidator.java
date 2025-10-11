@@ -7,7 +7,18 @@ public class UserPropertyValidator {
     public static final String USERNAME_REGEX = "^[a-zA-Z0-9_-]*$";
 
     public static boolean validPassword(String password) {
-        return password == null || password.isBlank() || password.length() < 8;
+        return password == null || password.isBlank() || password.length() <= 8 || contain4SequentialCharacters(password);
+    }
+
+    private static boolean contain4SequentialCharacters(String password) {
+        for (int i = 0; i < password.length() - 3; i++) {
+            if (password.charAt(i) + 1 == password.charAt(i + 1)
+                    && password.charAt(i + 1) + 1 == password.charAt(i + 2)
+                    && password.charAt(i + 2) + 1 == password.charAt(i + 3)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static boolean validUsername(String username) {

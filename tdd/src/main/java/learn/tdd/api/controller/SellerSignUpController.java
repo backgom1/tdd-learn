@@ -24,12 +24,14 @@ public record SellerSignUpController(SellerRepository sellerRepository, Password
             return ResponseEntity.badRequest().build();
         } else if (validPassword(request.password())) {
             return ResponseEntity.badRequest().build();
+        } else if (validEmail(request.contactEmail())) {
+            return ResponseEntity.badRequest().build();
         }
 
         if (sellerRepository.existsByEmailOrUsername(request.email(), request.username())) {
             return ResponseEntity.badRequest().build();
         }
-        sellerRepository.save(Seller.of(UUID.randomUUID(), request.email(), request.username(), request.password(), encoder));
+        sellerRepository.save(Seller.of(UUID.randomUUID(), request.email(), request.username(), request.password(), request.contactEmail(), encoder));
 
 
         return ResponseEntity.noContent().build();

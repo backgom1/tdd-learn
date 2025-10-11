@@ -28,7 +28,7 @@ public class POST_specs {
         // AAA 패턴
 
         //Arrange
-        var command = new CreateSellerCommand(generateEmail(), generateUsername(), "password");
+        var command = new CreateSellerCommand(generateEmail(), generateUsername(), "password",generateEmail());
 
         //Act
         ResponseEntity<Void> response = client.postForEntity("/seller/signup", command, Void.class);
@@ -45,7 +45,8 @@ public class POST_specs {
         var command = new CreateSellerCommand(
                 null,
                 generateUsername(),
-                "password"
+                "password",
+                generateEmail()
         );
 
         // Act
@@ -67,7 +68,8 @@ public class POST_specs {
         var command = new CreateSellerCommand(
                 generateEmail(),
                 null,
-                "password"
+                "password",
+                generateEmail()
         );
 
         // Act
@@ -98,7 +100,8 @@ public class POST_specs {
         var command = new CreateSellerCommand(
                 generateEmail(),
                 username,
-                "password"
+                "password",
+                generateEmail()
         );
 
         // Act
@@ -128,7 +131,8 @@ public class POST_specs {
         var command = new CreateSellerCommand(
                 email,
                 generateUsername(),
-                "password"
+                "password",
+                generateEmail()
         );
 
         // Act
@@ -158,7 +162,8 @@ public class POST_specs {
         var command = new CreateSellerCommand(
                 generateEmail(),
                 username,
-                "password"
+                "password",
+                generateEmail()
         );
 
         // Act
@@ -180,7 +185,8 @@ public class POST_specs {
         var command = new CreateSellerCommand(
                 generateEmail(),
                 generateUsername(),
-                null
+                null,
+                generateEmail()
         );
 
         // Act
@@ -204,7 +210,8 @@ public class POST_specs {
         var command = new CreateSellerCommand(
                 generateEmail(),
                 generateUsername(),
-                password
+                password,
+                generateEmail()
         );
 
         // Act
@@ -230,7 +237,8 @@ public class POST_specs {
                 new CreateSellerCommand(
                         email,
                         generateUsername(),
-                        "password"
+                        "password",
+                        generateEmail()
                 ),
                 Void.class
         );
@@ -241,7 +249,8 @@ public class POST_specs {
                 new CreateSellerCommand(
                         email,
                         generateUsername(),
-                        "password"
+                        "password",
+                        generateEmail()
                 ),
                 Void.class
         );
@@ -262,7 +271,8 @@ public class POST_specs {
                 new CreateSellerCommand(
                         generateEmail(),
                         username,
-                        "password"
+                        "password",
+                        generateEmail()
                 ),
                 Void.class
         );
@@ -273,7 +283,8 @@ public class POST_specs {
                 new CreateSellerCommand(
                         generateEmail(),
                         username,
-                        "password"
+                        "password",
+                        generateEmail()
                 ),
                 Void.class
         );
@@ -292,7 +303,8 @@ public class POST_specs {
         var command = new CreateSellerCommand(
                 generateEmail(),
                 generateUsername(),
-                generatePassword()
+                generatePassword(),
+                generateEmail()
         );
 
         // Act
@@ -308,6 +320,31 @@ public class POST_specs {
         String actual = seller.getHashPassword();
         assertThat(actual).isNotNull();
         assertThat(encoder.matches(command.password(), actual)).isTrue();
+    }
+
+    @ParameterizedTest
+    @MethodSource("learn.tdd.TestDataSource#invalidEmails")
+    void contactEmail_속성이_올바르게_지정되지_않으면_400_Bad_Request_상태코드를_반환한다(
+            String contactEmail,
+            @Autowired TestRestTemplate client
+    ) {
+        // Arrange
+        var command = new CreateSellerCommand(
+                generateEmail(),
+                generateUsername(),
+                generatePassword(),
+                contactEmail
+        );
+
+        // Act
+        ResponseEntity<Void> response = client.postForEntity(
+                "/seller/signup",
+                command,
+                Void.class
+        );
+
+        // Assert
+        assertThat(response.getStatusCode().value()).isEqualTo(400);
     }
 
 }

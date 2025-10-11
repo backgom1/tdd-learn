@@ -47,7 +47,15 @@ public record TestFixture(TestRestTemplate client, ProductRepository productRepo
                 username,
                 password
         );
-        client.postForEntity("/shopper/signup", command, Void.class);
+        ensureSuccessful(
+                client.postForEntity("/shopper/signup", command, Void.class), command);
+    }
+
+    private void ensureSuccessful(ResponseEntity<Void> response, Object request) {
+        if (!response.getStatusCode().is2xxSuccessful()) {
+            String message = "Request with " + request + " failed with status code " + response.getStatusCode();
+            throw new RuntimeException(message);
+        }
     }
 
     public String issueShopperToken(String email, String password) {
@@ -77,12 +85,13 @@ public record TestFixture(TestRestTemplate client, ProductRepository productRepo
     public void createSellerThenSetAsDefaultUser() {
         String email = generateEmail();
         String password = generatePassword();
-        createSeller(email, generateUsername(), password);
+        String contactEmail = generateEmail();
+        createSeller(email, generateUsername(), password, contactEmail);
         setSellerAsDefaultUser(email, password);
     }
 
-    private void createSeller(String email, String username, String password) {
-        CreateSellerCommand command = new CreateSellerCommand(email, username, password);
+    public void createSeller(String email, String username, String password, String contactEmail) {
+        CreateSellerCommand command = new CreateSellerCommand(email, username, password, contactEmail);
         client.postForEntity("/seller/signup", command, Void.class);
     }
 
@@ -154,8 +163,9 @@ public record TestFixture(TestRestTemplate client, ProductRepository productRepo
     public String consumeTwoProductPages() {
         String token = consumeProductPage();
         ResponseEntity<PageCarrier<ProductView>> response = client.exchange(
-                RequestEntity.get("/shopper/products?continuationToken="+token).build(),
-                new ParameterizedTypeReference<>() {}
+                RequestEntity.get("/shopper/products?continuationToken=" + token).build(),
+                new ParameterizedTypeReference<>() {
+                }
         );
         return requireNonNull(response.getBody()).continuationToken();
     }

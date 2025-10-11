@@ -15,6 +15,7 @@
     email:string,
     username:string,
     password:string
+    contactEmail:string
     }
 ```
 
@@ -36,6 +37,7 @@
 - [X] email 속성에 이미 존재하는 이메일 주소가 지정되면 400 Bad Request 상태코드를 반환한다.
 - [X] username 속성에 이미 존재하는 사용자이름이 지정되면 400 Bad Request 상태코드를 반환한다.
 - [X] 비밀번호를 올바르게 암호화한다.
+- [X] contactEmail 속성이 올바르게 지정되지 않으면 400 Bad Request 상태코드를 반환한다.
 
 ## 판매자 접근 토큰 발행
 
@@ -255,10 +257,10 @@ curl -i -X POST 'http://localhost:8080/seller/products' \
 - 헤더
   Location: /seller/products/{id}
 - 테스트
-- [ ] 올바르게 요청하면 201 Created 상태코드를 반환한다
-- [ ] 판매자가 아닌 사용자의 접근 토큰을 사용하면 403 Forbidden 상태코드를 반환한다
-- [ ] imageUri 속성이 URI 형식을 따르지 않으면 400 Bad Request 상태코드를 반환한다
-- [ ] 올바르게 요청하면 등록된 상품 정보에 접근하는 Location 헤더를 반환한다
+- [X] 올바르게 요청하면 201 Created 상태코드를 반환한다
+- [X] 판매자가 아닌 사용자의 접근 토큰을 사용하면 403 Forbidden 상태코드를 반환한다
+- [X] imageUri 속성이 URI 형식을 따르지 않으면 400 Bad Request 상태코드를 반환한다
+- [X] 올바르게 요청하면 등록된 상품 정보에 접근하는 Location 헤더를 반환한다
 
 ## 판매자 상품 조회
 
@@ -297,9 +299,9 @@ registeredTimeUtc: string(YYYY-MM-DDThh:mm:ss.sss)
 - [X] 판매자가 아닌 사용자의 접근 토큰을 사용하면 403 Forbidden 상태코드를 반환한다
 - [X] 존재하지 않는 상품 식별자를 사용하면 404 Not Found 상태코드를 반환한다
 - [X] 다른 판매자가 등록한 상품 식별자를 사용하면 404 Not Found 상태코드를 반환한다
-- [ ] 상품 식별자를 올바르게 반환한다
-- [ ] 상품 정보를 올바르게 반환한다
-- [ ] 상품 등록 시각을 올바르게 반환한다
+- [X] 상품 식별자를 올바르게 반환한다
+- [X] 상품 정보를 올바르게 반환한다
+- [X] 상품 등록 시각을 올바르게 반환한다
 
 ## 판매자 상품 목록 조회
 

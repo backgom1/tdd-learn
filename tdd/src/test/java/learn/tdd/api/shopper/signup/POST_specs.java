@@ -2,7 +2,6 @@ package learn.tdd.api.shopper.signup;
 
 import learn.TddApiTest;
 import learn.tdd.command.CreateShopperCommand;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;

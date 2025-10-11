@@ -2,6 +2,7 @@ package learn.tdd.api.seller.me;
 
 
 import learn.TddApiTest;
+import learn.tdd.api.TestFixture;
 import learn.tdd.command.CreateSellerCommand;
 import learn.tdd.query.IssueSellerToken;
 import learn.tdd.result.AccessTokenCarrier;
@@ -33,7 +34,8 @@ public class GET_specs {
         var command = new CreateSellerCommand(
                 email,
                 username,
-                password
+                password,
+                generateEmail()
         );
         client.postForEntity("/seller/signup", command, Void.class);
 
@@ -83,7 +85,8 @@ public class GET_specs {
         var command1 = new CreateSellerCommand(
                 email1,
                 username1,
-                password1
+                password1,
+                generateEmail()
         );
         client.postForEntity("/seller/signup", command1, Void.class);
 
@@ -101,7 +104,8 @@ public class GET_specs {
         var command2 = new CreateSellerCommand(
                 email2,
                 username2,
-                password2
+                password2,
+                generateEmail()
         );
         client.postForEntity("/seller/signup", command2, Void.class);
 
@@ -142,7 +146,8 @@ public class GET_specs {
         var command = new CreateSellerCommand(
                 email,
                 username,
-                password
+                password,
+                generateEmail()
         );
         client.postForEntity("/seller/signup", command, Void.class);
 
@@ -191,7 +196,8 @@ public class GET_specs {
         var command = new CreateSellerCommand(
                 email,
                 username,
-                password
+                password,
+                generateEmail()
         );
         client.postForEntity("/seller/signup", command, Void.class);
 
@@ -214,5 +220,37 @@ public class GET_specs {
         SellerMeView actual = requireNonNull(response.getBody());
         assertThat(actual.email()).isEqualTo(email);
         assertThat(actual.username()).isEqualTo(username);
+    }
+
+    @Test
+    void 문의_이메일_주소를_올바르게_설정한다(
+            @Autowired TestFixture fixture
+    ) {
+        // Arrange
+        String email = generateEmail();
+        String password = generatePassword();
+        String username = generateUsername();
+        String contactEmail = generateEmail();
+
+        fixture.createSeller(email, username, password, contactEmail);
+
+        AccessTokenCarrier carrier = fixture.client().postForObject(
+                "/seller/issueToken",
+                new IssueSellerToken(email, password),
+                AccessTokenCarrier.class
+        );
+        String token = carrier.accessToken();
+
+        // Act
+        ResponseEntity<SellerMeView> response = fixture.client().exchange(
+                get("/seller/me")
+                        .header("Authorization", "Bearer " + token)
+                        .build(),
+                SellerMeView.class
+        );
+
+        // Assert
+        SellerMeView actual = requireNonNull(response.getBody());
+        assertThat(actual.contactEmail()).isEqualTo(contactEmail);
     }
 }
